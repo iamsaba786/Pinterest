@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.defaults.baseURL = "https://pinterest-backend-chi.vercel.app";
 import {
   createContext,
   useContext,
