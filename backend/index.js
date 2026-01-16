@@ -20,7 +20,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Vite frontend port
+    origin: ["https://pinterest-mu-six.vercel.app", "http://localhost:5173"], // Vite frontend port
     credentials: true, // JWT cookies bhejne ke liye
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
