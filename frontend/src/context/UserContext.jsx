@@ -22,7 +22,7 @@ export const UserProvider = ({ children }) => {
   // ✅ Added logout function
   const logout = async () => {
     try {
-      await axios.get("/api/user/logout");
+      await axios.get("https://pinterest-sve7.onrender.com/api/user/logout");
       setUser(null);
       setIsAuth(false);
       toast.success("Logged out successfully!");
@@ -39,11 +39,14 @@ export const UserProvider = ({ children }) => {
   async function registerUser(name, email, password, navigate, fetchPins) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/register", {
-        name,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        "https://pinterest-sve7.onrender.com/api/user/register",
+        {
+          name,
+          email,
+          password,
+        }
+      );
 
       toast.success(data.message);
       setUser(data.user);
@@ -76,11 +79,14 @@ export const UserProvider = ({ children }) => {
 
   async function fetchUser() {
     try {
-      const { data } = await axios.get("/api/user/me", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const { data } = await axios.get(
+        "https://pinterest-sve7.onrender.com/api/user/me",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setUser(data);
       setIsAuth(true);
       setLoading(false);
@@ -93,7 +99,7 @@ export const UserProvider = ({ children }) => {
   async function followUser(id, fetchUser) {
     try {
       const { data } = await axios.post(
-        `/api/user/follow/${id}`,
+        `https://pinterest-sve7.onrender.com/api/user/follow/${id}`,
         {},
         {
           headers: {

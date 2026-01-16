@@ -23,7 +23,10 @@ export const PinProvider = ({ children }) => {
   const fetchPins = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/api/pin/all", getAuthHeader());
+      const { data } = await axios.get(
+        "https://pinterest-sve7.onrender.com/api/pin/all",
+        getAuthHeader()
+      );
       setPins(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Fetch pins error:", error);
@@ -41,7 +44,10 @@ export const PinProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const { data } = await axios.get(`/api/pin/${id}`, getAuthHeader());
+      const { data } = await axios.get(
+        `https://pinterest-sve7.onrender.com/api/pin/${id}`,
+        getAuthHeader()
+      );
       setPin(data);
     } catch (error) {
       console.error("Fetch pin error:", error);
@@ -61,9 +67,13 @@ export const PinProvider = ({ children }) => {
       navigate
     ) => {
       try {
-        const { data } = await axios.post("/api/pin/new", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const { data } = await axios.post(
+          "https://pinterest-sve7.onrender.com/api/pin/new",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
         toast.success(data.message);
         setFilePrev?.("");
         setFile?.(null);
@@ -111,7 +121,7 @@ export const PinProvider = ({ children }) => {
       async (id, comment, setComment) => {
         try {
           const { data } = await axios.post(
-            `/api/pin/comment/${id}`,
+            `https://pinterest-sve7.onrender.com/api/pin/comment/${id}`,
             { comment },
             getAuthHeader()
           );
@@ -128,7 +138,7 @@ export const PinProvider = ({ children }) => {
       async (id, commentId) => {
         try {
           const { data } = await axios.delete(
-            `/api/pin/comment/${id}?commentId=${commentId}`,
+            `https://pinterest-sve7.onrender.com/api/pin/comment/${id}?commentId=${commentId}`,
             getAuthHeader()
           );
           toast.success(data.message);
