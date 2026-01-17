@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { PinData } from "../context/PinContext";
 import { UserData } from "../context/UserContext";

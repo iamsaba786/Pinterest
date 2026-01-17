@@ -5,7 +5,7 @@ import PinCard from "../components/PinCard";
 import { Loading } from "../components/Loading";
 import { FaEdit, FaTrash, FaCamera } from "react-icons/fa";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import api, { pinAPI } from "../utils/axios.js";
 import { useNavigate } from "react-router-dom";
 
 const Account = () => {
@@ -24,7 +24,7 @@ const Account = () => {
   const userPins = useMemo(() => {
     if (!Array.isArray(pins) || !user?._id) return [];
     return pins.filter(
-      (pin) => pin.owner === user._id || pin.user?._id === user._id
+      (pin) => pin.owner === user._id || pin.user?._id === user._id,
     );
   }, [pins, user]);
 
@@ -50,9 +50,8 @@ const Account = () => {
       if (editBio.trim()) formData.append("bio", editBio);
       if (profilePic) formData.append("profilePic", profilePic);
 
-      await axios.put("/api/user/update", formData, {
+      await api.put("/user/update", formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -72,9 +71,7 @@ const Account = () => {
     if (!confirm("Delete this pin forever?")) return;
 
     try {
-      await axios.delete(`/api/pin/${pinId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await api.delete(`/pin/${pinId}`);
       toast.success("Pin deleted!");
     } catch (error) {
       toast.error("Delete failed");
@@ -87,9 +84,7 @@ const Account = () => {
     if (!confirmLogout) return;
 
     try {
-      await axios.get("/api/user/logout", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await api.get("/user/logout");
       toast.success("Successfully logged out!");
       setIsAuth(false);
       localStorage.removeItem("token");

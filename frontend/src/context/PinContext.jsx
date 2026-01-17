@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../utils/axios.js"; // 👈 YE ADD KARO (Line 1)
 import {
   createContext,
   useContext,
@@ -12,21 +12,16 @@ const PinContext = createContext();
 
 export const PinProvider = ({ children }) => {
   const [pins, setPins] = useState([]);
-  const [loading, setLoading] = useState(false); // ✅ false initially
+  const [loading, setLoading] = useState(false);
   const [pin, setPin] = useState(null);
 
-  const getAuthHeader = () => ({
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  });
+  // ✅ getAuthHeader DELETE - ab auto handle hota hai!
 
-  // ✅ FIXED: No dependencies = No infinite loop!
+  // ✅ fetchPins - api use kiya
   const fetchPins = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        "https://pinterest-sve7.onrender.com/api/pin/all",
-        getAuthHeader()
-      );
+      const { data } = await api.get("/pin/all"); // 👈 SIMPLIFIED
       setPins(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Fetch pins error:", error);
@@ -36,7 +31,7 @@ export const PinProvider = ({ children }) => {
     }
   }, []);
 
-  // 🔥 EMERGENCY FIX: EMPTY DEPENDENCIES!
+  // ✅ fetchPin - api use kiya
   const fetchPin = useCallback(async (id) => {
     if (!id) {
       setPin(null);
@@ -44,10 +39,7 @@ export const PinProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `https://pinterest-sve7.onrender.com/api/pin/${id}`,
-        getAuthHeader()
-      );
+      const { data } = await api.get(`/pin/${id}`); // 👈 SIMPLIFIED
       setPin(data);
     } catch (error) {
       console.error("Fetch pin error:", error);
@@ -55,8 +47,9 @@ export const PinProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []); // ✅ NO DEPENDENCIES = NO INFINITE LOOP!
+  }, []);
 
+  // ✅ addPin - apiUpload use kiya
   const addPin = useCallback(
     async (
       formData,
@@ -64,16 +57,12 @@ export const PinProvider = ({ children }) => {
       setFile,
       setTitle,
       setPinContent,
-      navigate
+      navigate,
     ) => {
       try {
-        const { data } = await axios.post(
-          "https://pinterest-sve7.onrender.com/api/pin/new",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+        const { data } = await api.post("/pin/new", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success(data.message);
         setFilePrev?.("");
         setFile?.(null);
@@ -85,10 +74,9 @@ export const PinProvider = ({ children }) => {
         toast.error(error.response?.data?.message || "Pin creation failed");
       }
     },
-    [fetchPins]
+    [fetchPins],
   );
 
-  // ✅ SAFE useEffect - Won't infinite loop
   useEffect(() => {
     fetchPins();
   }, [fetchPins]);
@@ -103,11 +91,10 @@ export const PinProvider = ({ children }) => {
     updatePin: useCallback(
       async (id, title, pinContent, setEdit) => {
         try {
-          const { data } = await axios.put(
-            `/api/pin/${id}`,
-            { title, pin: pinContent },
-            getAuthHeader()
-          );
+          const { data } = await api.put(`/pin/${id}`, {
+            title,
+            pin: pinContent,
+          }); // 👈 FIXED
           toast.success(data.message);
           await fetchPin(id);
           setEdit(false);
@@ -115,16 +102,12 @@ export const PinProvider = ({ children }) => {
           toast.error(error.response?.data?.message || "Update failed");
         }
       },
-      [fetchPin]
+      [fetchPin],
     ),
     addComment: useCallback(
       async (id, comment, setComment) => {
         try {
-          const { data } = await axios.post(
-            `https://pinterest-sve7.onrender.com/api/pin/comment/${id}`,
-            { comment },
-            getAuthHeader()
-          );
+          const { data } = await api.post(`/pin/comment/${id}`, { comment }); // 👈 FIXED
           toast.success(data.message);
           await fetchPin(id);
           setComment("");
@@ -132,31 +115,27 @@ export const PinProvider = ({ children }) => {
           toast.error(error.response?.data?.message || "Comment failed");
         }
       },
-      [fetchPin]
+      [fetchPin],
     ),
     deleteComment: useCallback(
       async (id, commentId) => {
         try {
-          const { data } = await axios.delete(
-            `https://pinterest-sve7.onrender.com/api/pin/comment/${id}?commentId=${commentId}`,
-            getAuthHeader()
-          );
+          const { data } = await api.delete(
+            `/pin/comment/${id}?commentId=${commentId}`,
+          ); // 👈 FIXED
           toast.success(data.message);
           await fetchPin(id);
         } catch (error) {
           toast.error(error.response?.data?.message || "Delete failed");
         }
       },
-      [fetchPin]
+      [fetchPin],
     ),
     deletePin: useCallback(
       async (id, navigate) => {
         try {
           setLoading(true);
-          const { data } = await axios.delete(
-            `/api/pin/${id}`,
-            getAuthHeader()
-          );
+          const { data } = await api.delete(`/pin/${id}`); // 👈 FIXED
           toast.success(data.message);
           await fetchPins();
           navigate?.("/");
@@ -166,7 +145,7 @@ export const PinProvider = ({ children }) => {
           setLoading(false);
         }
       },
-      [fetchPins]
+      [fetchPins],
     ),
   };
 

@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../utils/axios.js";
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { PinData } from "../context/PinContext";
@@ -25,9 +25,7 @@ const UserProfile = () => {
     if (!params.id) return;
     try {
       setProfileLoading(true);
-      const { data } = await axios.get(`/api/user/${params.id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const { data } = await api.get(`/user/${params.id}`);
       setProfileUser(data);
 
       if (loggedInUser?._id && data.followers?.includes(loggedInUser._id)) {

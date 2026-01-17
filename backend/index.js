@@ -20,11 +20,11 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://pinterest-mu-six.vercel.app", "http://localhost:5173"], // Vite frontend port
-    credentials: true, // JWT cookies bhejne ke liye
+    origin: ["https://pinterest-mu-six.vercel.app", "http://localhost:5173"],
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 app.use(express.json());
@@ -35,7 +35,7 @@ app.use("/api/pin", pinRoutes);
 connectDb()
   .then(() => {
     app.listen(port, () => {
-      console.log(`🚀 Server: http://localhost:${port}`);
+      console.log(`Server: http://localhost:${port}`);
     });
   })
   .catch((err) => {

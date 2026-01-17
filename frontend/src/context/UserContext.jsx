@@ -1,28 +1,27 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
+import { Toaster } from "react-hot-toast";
+import api from "../utils/axios.js";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // ✅ null instead of []
+  const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [darkMode, setDarkMode] = useState(() => {
-    // Load from localStorage on first render
     if (typeof window !== "undefined") {
       return localStorage.getItem("darkMode") === "true";
     }
     return false;
   });
 
-  // ✅ Added logout function
+  // ✅ logout - SIMPLIFIED
   const logout = async () => {
     try {
-      await axios.get("https://pinterest-sve7.onrender.com/api/user/logout");
+      await api.get("/user/logout"); // 👈 FIXED
       setUser(null);
       setIsAuth(false);
       toast.success("Logged out successfully!");
@@ -31,22 +30,21 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // ✅ Added toggleDarkMode function
+  // ✅ toggleDarkMode same
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
 
+  // ✅ registerUser - SIMPLIFIED
   async function registerUser(name, email, password, navigate, fetchPins) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post(
-        "https://pinterest-sve7.onrender.com/api/user/register",
-        {
-          name,
-          email,
-          password,
-        }
-      );
+      const { data } = await api.post("/user/register", {
+        // 👈 FIXED
+        name,
+        email,
+        password,
+      });
 
       toast.success(data.message);
       setUser(data.user);
@@ -60,11 +58,11 @@ export const UserProvider = ({ children }) => {
     }
   }
 
+  // ✅ loginUser - SIMPLIFIED
   async function loginUser(email, password, navigate, fetchPins) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/login", { email, password });
-
+      const { data } = await api.post("/user/login", { email, password }); // 👈 FIXED
       toast.success(data.message);
       setUser(data.user);
       setIsAuth(true);
@@ -77,16 +75,10 @@ export const UserProvider = ({ children }) => {
     }
   }
 
+  // ✅ fetchUser - SIMPLIFIED
   async function fetchUser() {
     try {
-      const { data } = await axios.get(
-        "https://pinterest-sve7.onrender.com/api/user/me",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const { data } = await api.get("/user/me"); // 👈 FIXED (No headers needed!)
       setUser(data);
       setIsAuth(true);
       setLoading(false);
@@ -96,17 +88,10 @@ export const UserProvider = ({ children }) => {
     }
   }
 
+  // ✅ followUser - SIMPLIFIED
   async function followUser(id, fetchUser) {
     try {
-      const { data } = await axios.post(
-        `https://pinterest-sve7.onrender.com/api/user/follow/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const { data } = await api.post(`/user/follow/${id}`, {}); // 👈 FIXED
       toast.success(data.message);
       fetchUser();
     } catch (error) {
@@ -134,11 +119,11 @@ export const UserProvider = ({ children }) => {
         setIsAuth,
         setUser,
         followUser,
-        logout, // ✅ Added
-        darkMode, // ✅ Added
-        toggleDarkMode, // ✅ Added
+        logout,
+        darkMode,
+        toggleDarkMode,
         searchQuery,
-        setSearchQuery, // ✅ Added
+        setSearchQuery,
       }}
     >
       {children}
