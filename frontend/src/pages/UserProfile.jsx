@@ -13,7 +13,7 @@ const UserProfile = () => {
     followUser,
     loading: userLoading,
     darkMode,
-  } = UserData(); // ✅ darkMode added
+  } = UserData();
   const { pins, loading: pinsLoading } = PinData();
 
   const [profileUser, setProfileUser] = useState(null);
@@ -64,7 +64,7 @@ const UserProfile = () => {
     return (
       <div
         className={`
-        min-h-screen flex items-center justify-center 
+        min-h-screen pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center justify-center px-4
         ${
           darkMode
             ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black"
@@ -82,7 +82,7 @@ const UserProfile = () => {
     return (
       <div
         className={`
-        min-h-screen flex items-center justify-center 
+        min-h-screen pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center justify-center px-4
         ${
           darkMode
             ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black"
@@ -90,10 +90,10 @@ const UserProfile = () => {
         }
       `}
       >
-        <div className="text-center p-12">
+        <div className="text-center p-8 sm:p-12 max-w-md w-full mx-4">
           <h2
             className={`
-            text-3xl font-bold mb-4 
+            text-2xl sm:text-3xl font-bold mb-6 
             ${darkMode ? "text-zinc-100" : "text-gray-800"}
           `}
           >
@@ -101,7 +101,7 @@ const UserProfile = () => {
           </h2>
           <Link
             to="/"
-            className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-2xl font-bold hover:from-red-600 hover:to-pink-600 transition-all shadow-xl hover:shadow-2xl"
+            className="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-2xl font-bold hover:from-red-600 hover:to-pink-600 transition-all shadow-xl hover:shadow-2xl inline-block text-sm sm:text-base"
           >
             Back to Home
           </Link>
@@ -115,7 +115,7 @@ const UserProfile = () => {
     return (
       <div
         className={`
-        min-h-screen flex items-center justify-center 
+        min-h-screen pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center justify-center px-4
         ${
           darkMode
             ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black"
@@ -123,10 +123,10 @@ const UserProfile = () => {
         }
       `}
       >
-        <div className="text-center p-12">
+        <div className="text-center p-8 sm:p-12 max-w-md w-full mx-4">
           <h2
             className={`
-            text-2xl font-bold mb-4 
+            text-xl sm:text-2xl font-bold mb-6 
             ${darkMode ? "text-zinc-100" : "text-gray-900"}
           `}
           >
@@ -139,7 +139,7 @@ const UserProfile = () => {
                 darkMode
                   ? "text-rose-400 hover:text-rose-300"
                   : "text-red-500 hover:text-red-600"
-              } font-semibold hover:underline transition-colors
+              } font-semibold hover:underline transition-colors text-sm sm:text-base
             `}
           >
             Go to Login
@@ -152,7 +152,7 @@ const UserProfile = () => {
   return (
     <div
       className={`
-      min-h-screen pt-20 transition-colors duration-300
+      min-h-screen pt-4 sm:pt-6 md:pt-8 lg:pt-20 transition-colors duration-300
       ${
         darkMode
           ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black text-zinc-100"
@@ -160,12 +160,12 @@ const UserProfile = () => {
       }
     `}
     >
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-16">
+      <div className="max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto px-4 py-8 sm:py-12 md:py-16">
+        <div className="text-center mb-12 sm:mb-16 md:mb-20">
           {/* Profile Picture */}
           <div
             className={`
-            w-32 h-32 mx-auto mb-8 rounded-full p-2 shadow-2xl transition-all duration-300
+            w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto mb-6 sm:mb-8 rounded-full p-1 sm:p-2 shadow-2xl transition-all duration-300
             ${
               darkMode
                 ? "bg-gradient-to-br from-zinc-700 to-zinc-600 shadow-zinc-500/25 ring-4 ring-zinc-800/50"
@@ -182,7 +182,7 @@ const UserProfile = () => {
             ) : (
               <div
                 className={`
-                w-full h-full rounded-full flex items-center justify-center shadow-xl font-bold text-3xl transition-colors
+                w-full h-full rounded-full flex items-center justify-center shadow-xl font-bold text-2xl sm:text-3xl transition-colors
                 ${
                   darkMode
                     ? "bg-gradient-to-br from-zinc-600 to-zinc-500 text-zinc-100 shadow-zinc-400/25"
@@ -198,7 +198,7 @@ const UserProfile = () => {
           {/* Profile Info */}
           <h1
             className={`
-            text-5xl font-black mb-4 bg-gradient-to-r bg-clip-text text-transparent transition-all
+            text-3xl sm:text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r bg-clip-text text-transparent transition-all
             ${
               darkMode
                 ? "from-zinc-200 via-zinc-100 to-white"
@@ -210,7 +210,7 @@ const UserProfile = () => {
           </h1>
           <p
             className={`
-            text-2xl mb-8 transition-colors
+            text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 transition-colors
             ${darkMode ? "text-zinc-300" : "text-gray-600"}
           `}
           >
@@ -218,10 +218,10 @@ const UserProfile = () => {
           </p>
 
           {/* Stats */}
-          <div className="flex justify-center gap-12 mb-12 text-xl">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 mb-8 sm:mb-12 items-center">
             <div
               className={`
-              p-4 rounded-2xl backdrop-blur-sm transition-all duration-300
+              p-3 sm:p-4 md:p-4 rounded-2xl backdrop-blur-sm transition-all duration-300 flex-1 max-w-xs text-center
               ${
                 darkMode
                   ? "bg-zinc-800/50 shadow-zinc-500/10 hover:bg-zinc-700/70 border border-zinc-700/50"
@@ -231,7 +231,7 @@ const UserProfile = () => {
             >
               <span
                 className={`
-                font-bold text-3xl block
+                font-bold text-2xl sm:text-3xl block
                 ${darkMode ? "text-zinc-100" : "text-gray-900"}
               `}
               >
@@ -239,7 +239,7 @@ const UserProfile = () => {
               </span>
               <p
                 className={`
-                text-sm uppercase tracking-wide font-semibold mt-1
+                text-xs sm:text-sm uppercase tracking-wide font-semibold mt-1
                 ${darkMode ? "text-zinc-400" : "text-gray-600"}
               `}
               >
@@ -248,7 +248,7 @@ const UserProfile = () => {
             </div>
             <div
               className={`
-              p-4 rounded-2xl backdrop-blur-sm transition-all duration-300
+              p-3 sm:p-4 md:p-4 rounded-2xl backdrop-blur-sm transition-all duration-300 flex-1 max-w-xs text-center
               ${
                 darkMode
                   ? "bg-zinc-800/50 shadow-zinc-500/10 hover:bg-zinc-700/70 border border-zinc-700/50"
@@ -258,7 +258,7 @@ const UserProfile = () => {
             >
               <span
                 className={`
-                font-bold text-3xl block
+                font-bold text-2xl sm:text-3xl block
                 ${darkMode ? "text-zinc-100" : "text-gray-900"}
               `}
               >
@@ -266,7 +266,7 @@ const UserProfile = () => {
               </span>
               <p
                 className={`
-                text-sm uppercase tracking-wide font-semibold mt-1
+                text-xs sm:text-sm uppercase tracking-wide font-semibold mt-1
                 ${darkMode ? "text-zinc-400" : "text-gray-600"}
               `}
               >
@@ -275,7 +275,7 @@ const UserProfile = () => {
             </div>
             <div
               className={`
-              p-4 rounded-2xl backdrop-blur-sm transition-all duration-300
+              p-3 sm:p-4 md:p-4 rounded-2xl backdrop-blur-sm transition-all duration-300 flex-1 max-w-xs text-center
               ${
                 darkMode
                   ? "bg-zinc-800/50 shadow-zinc-500/10 hover:bg-zinc-700/70 border border-zinc-700/50"
@@ -285,7 +285,7 @@ const UserProfile = () => {
             >
               <span
                 className={`
-                font-bold text-3xl block
+                font-bold text-2xl sm:text-3xl block
                 ${darkMode ? "text-zinc-100" : "text-gray-900"}
               `}
               >
@@ -293,7 +293,7 @@ const UserProfile = () => {
               </span>
               <p
                 className={`
-                text-sm uppercase tracking-wide font-semibold mt-1
+                text-xs sm:text-sm uppercase tracking-wide font-semibold mt-1
                 ${darkMode ? "text-zinc-400" : "text-gray-600"}
               `}
               >
@@ -307,11 +307,11 @@ const UserProfile = () => {
             <button
               onClick={followHandler}
               className={`
-                px-8 py-4 rounded-3xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1
+                px-6 sm:px-8 py-3 sm:py-4 rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto max-w-xs mx-auto
                 ${
                   isFollow
-                    ? "bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white"
-                    : "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white"
+                    ? "bg-red-700 hover:bg-red-800 text-white"
+                    : "bg-red-700 hover:bg-red-800 text-white"
                 }
               `}
             >
@@ -324,7 +324,7 @@ const UserProfile = () => {
         <div>
           <h2
             className={`
-            text-3xl font-bold text-center mb-12 bg-gradient-to-r bg-clip-text text-transparent transition-all
+            text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 bg-gradient-to-r bg-clip-text text-transparent transition-all
             ${
               darkMode
                 ? "from-zinc-200 via-zinc-100 to-white drop-shadow-lg"
@@ -336,7 +336,7 @@ const UserProfile = () => {
           </h2>
 
           {userPins.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
               {userPins.map((pin) => (
                 <PinCard key={pin._id} pin={pin} />
               ))}
@@ -344,13 +344,13 @@ const UserProfile = () => {
           ) : (
             <div
               className={`
-              text-center py-20 transition-colors
+              text-center py-12 sm:py-20 transition-colors max-w-md mx-auto
               ${darkMode ? "text-zinc-400" : "text-gray-500"}
             `}
             >
               <div
                 className={`
-                w-24 h-24 mx-auto mb-6 opacity-40 transition-colors
+                w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 opacity-40 transition-colors
                 ${darkMode ? "text-zinc-600" : "text-gray-400"}
               `}
               >
@@ -364,13 +364,13 @@ const UserProfile = () => {
               </div>
               <h3
                 className={`
-                text-2xl font-bold mb-4 transition-colors
+                text-xl sm:text-2xl font-bold mb-4 transition-colors
                 ${darkMode ? "text-zinc-300" : "text-gray-600"}
               `}
               >
                 No pins yet
               </h3>
-              <p className="text-lg">
+              <p className="text-base sm:text-lg">
                 {profileUser._id === loggedInUser._id
                   ? "Create your first pin!"
                   : `${profileUser.name} hasn't created any pins yet.`}

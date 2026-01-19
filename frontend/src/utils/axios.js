@@ -1,13 +1,13 @@
 import axios from "axios";
 
 // Environment-aware baseURL
-const baseURL = import.meta.env.DEV 
-  ? "http://localhost:5000/api" 
+const baseURL = import.meta.env.DEV
+  ? "http://localhost:5000/api"
   : "https://pinterest-sve7.onrender.com/api";
 
 // Main API instance (JWT cookies auto)
 const api = axios.create({
-  baseURL, 
+  baseURL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -16,7 +16,7 @@ const api = axios.create({
 
 // Upload API (multipart files)
 export const apiUpload = axios.create({
-  baseURL,  
+  baseURL,
   withCredentials: true,
 });
 
@@ -26,7 +26,7 @@ api.interceptors.request.use(
     // Future: Loading spinner global
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor (errors handle)
@@ -39,7 +39,7 @@ api.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Auth APIs

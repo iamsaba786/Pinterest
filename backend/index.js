@@ -18,11 +18,17 @@ cloudinary.v2.config({
 const app = express();
 const port = process.env.PORT || 5000;
 
+// ✅ CORRECT - Add Render backend + all Vercel URLs
 app.use(
   cors({
-    origin: ["https://pinterest-mu-six.vercel.app", "http://localhost:5173"],
+    origin: [
+      "https://pinterest-mu-six.vercel.app", // Vercel frontend
+      "https://pinterest-sve7.vercel.app", // Add this if different
+      "http://localhost:5173", // Vite dev
+      "http://localhost:3000", // CRA dev
+    ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
