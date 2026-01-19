@@ -48,7 +48,7 @@ const Account = () => {
       const formData = new FormData();
       formData.append("name", editName);
       if (editBio.trim()) formData.append("bio", editBio);
-      if (profilePic) formData.append("profilePic", profilePic);
+      if (profilePic) formData.append("avatar", profilePic);
 
       await api.put("/user/update", formData, {
         headers: {
