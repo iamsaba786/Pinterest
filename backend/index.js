@@ -20,7 +20,11 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://pinterest-mu-six.vercel.app", "http://localhost:5173"],
+    origin: [
+      "https://pinterest-mu-six.vercel.app",
+      "http://localhost:5173",
+      "https://pinterest-sve7.onrender.com",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
