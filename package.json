@@ -20,11 +20,13 @@
     "datauri": "^4.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "react-hot-toast": "^2.6.0"
+    "react-hot-toast": "^2.6.0",
+    "redis": "^5.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

@@ -2,6 +2,7 @@ import { Pin } from "../models/pinModel.js";
 import TryCatch from "../utils/TryCatch.js";
 import getDataUrl from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
+import redisClient from "../utils/redis.js";
 
 export const createPin = TryCatch(async (req, res) => {
   const { title, pin } = req.body;
@@ -25,6 +26,7 @@ export const createPin = TryCatch(async (req, res) => {
     },
     owner: req.user._id,
   });
+  await redisClient.del("ALL_PINS");
 
   res.status(201).json({
     message: "Pin Created Successfully",
@@ -32,14 +34,36 @@ export const createPin = TryCatch(async (req, res) => {
 });
 
 export const getAllPins = TryCatch(async (req, res) => {
+  const cachedPins = await redisClient.get("ALL_PINS");
+
+  if (cachedPins) {
+    console.log("⚡ Pins from Redis");
+    return res.json(JSON.parse(cachedPins));
+  }
+
   const pins = await Pin.find().sort({ createdAt: -1 });
 
+  await redisClient.setEx(
+    "ALL_PINS",
+    60, //
+    JSON.stringify(pins),
+  );
+
+  console.log("🐢 Pins from MongoDB");
   res.json(pins);
 });
 
 export const getSinglePin = TryCatch(async (req, res) => {
+  const key = `PIN_${req.params.id}`;
+
+  const cachedPin = await redisClient.get(key);
+  if (cachedPin) {
+    return res.json(JSON.parse(cachedPin));
+  }
+
   const pin = await Pin.findById(req.params.id).populate("owner", "-password");
 
+  await redisClient.setEx(key, 60, JSON.stringify(pin));
   res.json(pin);
 });
 

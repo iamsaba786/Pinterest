@@ -7,6 +7,7 @@ import cloudinary from "cloudinary";
 import userRoutes from "./routes/userRoutes.js";
 import pinRoutes from "./routes/pinRoutes.js";
 import morgan from "morgan";
+import "./utils/redis.js";
 
 dotenv.config();
 
