@@ -375,7 +375,7 @@ const PinPage = () => {
     ${
       darkMode
         ? `
-          bg-zinc-600 hover:bg-zinc-500 text-zinc-100
+          bg-zinc-500 hover:bg-zinc-500 text-zinc-100
           shadow-[0_6px_0_0_rgba(85,82,91,1)]
           hover:shadow-[0_8px_0_0_rgba(85,82,93,1)]
           active:shadow-[0_3px_0_0_rgba(85,82,95,1)]
@@ -441,7 +441,7 @@ const PinPage = () => {
     ${
       darkMode
         ? `
-          bg-emerald-600 hover:bg-emerald-500 text-zinc-100
+          bg-emerald-600  text-zinc-100
           shadow-[0_8px_0_0_rgba(16,185,129,1)]
           hover:shadow-[0_10px_0_0_rgba(16,185,129,1)]
           active:shadow-[0_3px_0_0_rgba(16,185,129,1)]

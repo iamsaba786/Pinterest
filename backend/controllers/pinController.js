@@ -12,7 +12,9 @@ export const createPin = TryCatch(async (req, res) => {
   }
 
   const fileUrl = getDataUrl(file);
-  const cloud = await cloudinary.v2.uploader.upload(fileUrl.content);
+  const cloud = await cloudinary.v2.uploader.upload(fileUrl, {
+    folder: "Pinterest/Pins",
+  });
 
   await Pin.create({
     title,
@@ -76,7 +78,7 @@ export const deleteComment = TryCatch(async (req, res) => {
     });
 
   const commentIndex = pin.comments.findIndex(
-    (item) => item._id.toString() === req.query.commentId.toString()
+    (item) => item._id.toString() === req.query.commentId.toString(),
   );
 
   if (commentIndex === -1) {

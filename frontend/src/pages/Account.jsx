@@ -230,7 +230,19 @@ const Account = () => {
               {editMode ? (
                 <button
                   onClick={handleEditProfile}
-                  className="px-5 py-2 rounded-lg bg-neutral-900 text-white text-sm"
+                  className="
+    px-5 py-2 rounded-lg text-sm font-semibold text-white
+
+    bg-neutral-900
+
+    transform transition-all duration-200
+    hover:-translate-y-0.5
+    active:translate-y-1
+
+    shadow-[0_6px_0_0_rgba(10,10,10,1)]
+    hover:shadow-[0_8px_0_0_rgba(10,10,10,1)]
+    active:shadow-[0_3px_0_0_rgba(10,10,10,1)]
+  "
                 >
                   Save
                 </button>
