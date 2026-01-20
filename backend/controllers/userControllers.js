@@ -119,30 +119,21 @@ export const updateUserProfile = TryCatch(async (req, res) => {
   const { name, bio } = req.body;
   const file = req.file;
 
+  console.log("File received in controller:", file); // MUST show file object
+
   const user = await User.findById(req.user._id);
+  if (!user) return res.status(404).json({ message: "User not found" });
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+  if (name?.trim()) user.name = name.trim();
+  if (bio !== undefined) user.bio = bio.trim();
 
-  // ✅ Name update
-  if (name && name.trim() !== "") {
-    user.name = name.trim();
-  }
-
-  // ✅ Bio update (THIS WAS MISSING)
-  if (bio !== undefined) {
-    user.bio = bio.trim();
-  }
-
-  // ✅ Profile picture update
   if (file) {
-    if (user.profilePic?.id) {
+    if (user.profilePic?.id)
       await cloudinary.v2.uploader.destroy(user.profilePic.id);
-    }
 
-    // const fileUrl = getDataUrl(file);
-    const cloud = await cloudinary.v2.uploader.upload(file.path, {
+    const fileUrl = getDataUrl(file); // convert buffer -> dataURL
+
+    const cloud = await cloudinary.v2.uploader.upload(fileUrl, {
       folder: "Pinterest/Avatars",
       width: 150,
       height: 150,
@@ -150,10 +141,7 @@ export const updateUserProfile = TryCatch(async (req, res) => {
       gravity: "face",
     });
 
-    user.profilePic = {
-      id: cloud.public_id,
-      url: cloud.secure_url,
-    };
+    user.profilePic = { id: cloud.public_id, url: cloud.secure_url };
   }
 
   await user.save();
@@ -163,3 +151,52 @@ export const updateUserProfile = TryCatch(async (req, res) => {
     user,
   });
 });
+
+// export const updateUserProfile = TryCatch(async (req, res) => {
+//   const { name, bio } = req.body;
+//   const file = req.file;
+
+//   const user = await User.findById(req.user._id);
+
+//   if (!user) {
+//     return res.status(404).json({ message: "User not found" });
+//   }
+
+//   // ✅ Name update
+//   if (name && name.trim() !== "") {
+//     user.name = name.trim();
+//   }
+
+//   // ✅ Bio update (THIS WAS MISSING)
+//   if (bio !== undefined) {
+//     user.bio = bio.trim();
+//   }
+
+//   // ✅ Profile picture update
+//   if (file) {
+//     if (user.profilePic?.id) {
+//       await cloudinary.v2.uploader.destroy(user.profilePic.id);
+//     }
+
+//     // const fileUrl = getDataUrl(file);
+//     const cloud = await cloudinary.v2.uploader.upload(file.path, {
+//       folder: "Pinterest/Avatars",
+//       width: 150,
+//       height: 150,
+//       crop: "fill",
+//       gravity: "face",
+//     });
+
+//     user.profilePic = {
+//       id: cloud.public_id,
+//       url: cloud.secure_url,
+//     };
+//   }
+
+//   await user.save();
+
+//   res.status(200).json({
+//     message: "Profile updated successfully ✅",
+//     user,
+//   });
+// });

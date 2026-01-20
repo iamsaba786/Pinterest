@@ -42,29 +42,60 @@ const Account = () => {
   // EDIT PROFILE
   const handleEditProfile = async (e) => {
     e.preventDefault();
-    if (!editName.trim()) return;
+    if (!editName.trim()) return; // name cannot be empty
 
     try {
       const formData = new FormData();
       formData.append("name", editName);
       if (editBio.trim()) formData.append("bio", editBio);
-      if (profilePic) formData.append("avatar", profilePic);
+      if (profilePic) formData.append("avatar", profilePic); // must match multer field name
 
-      await api.put("/user/update", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // ✅ Debug: log FormData
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+        // avatar should log as File {...}
+      }
 
-      toast.success("Profile updated!");
+      // ✅ DO NOT set Content-Type manually! Let Axios handle it
+      const { data } = await api.put("/user/update", formData);
+
+      toast.success(data.message || "Profile updated!");
+
+      // Reset edit mode + previews
       setEditMode(false);
       setProfilePic(null);
       setProfilePicPreview("");
-      window.location.reload(); // To get updated user data
+
+      // Optional: update user state in context without reload
+      // setUser(data.user);
     } catch (error) {
+      console.error(error);
       toast.error(error.response?.data?.message || "Update failed");
     }
   };
+
+  // // EDIT PROFILE
+  // const handleEditProfile = async (e) => {
+  //   e.preventDefault();
+  //   if (!editName.trim()) return;
+
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("name", editName);
+  //     if (editBio.trim()) formData.append("bio", editBio);
+  //     if (profilePic) formData.append("avatar", profilePic);
+
+  //     await api.put("/user/update", formData);
+
+  //     toast.success("Profile updated!");
+  //     setEditMode(false);
+  //     setProfilePic(null);
+  //     setProfilePicPreview("");
+  //     window.location.reload(); // To get updated user data
+  //   } catch (error) {
+  //     toast.error(error.response?.data?.message || "Update failed");
+  //   }
+  // };
 
   // DELETE PIN
   const deletePinHandler = async (pinId) => {

@@ -1,5 +1,5 @@
 import express from "express";
-import multer from "multer";
+// import multer from "multer";
 import { storage, uploadProfilePic } from "../middlewares/multer.js";
 import {
   followAndUnfollowUser,
@@ -8,9 +8,10 @@ import {
   myProfile,
   registerUser,
   userProfile,
+  updateUserProfile,
 } from "../controllers/userControllers.js";
 import { isAuth } from "../middlewares/isAuth.js";
-import { updateUserProfile } from "../controllers/userControllers.js";
+// import { uploadProfilePic } from "../middlewares/multer.js";
 
 const router = express.Router();
 

@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 import userRoutes from "./routes/userRoutes.js";
 import pinRoutes from "./routes/pinRoutes.js";
+import morgan from "morgan";
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
-
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/user", userRoutes);
