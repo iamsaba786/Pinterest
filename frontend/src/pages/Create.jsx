@@ -51,7 +51,7 @@ const Create = () => {
       setFile,
       setTitle,
       setDescription,
-      navigate
+      navigate,
     );
   };
 
@@ -156,7 +156,7 @@ const Create = () => {
           {/* 3D BUTTON */}
           <button
             type="submit"
-            className="relative px-12 py-4 rounded-full font-semibold
+            className="relative bottom-4 px-12 py-4 rounded-full font-semibold
             bg-white text-black shadow-[0_8px_0_#ccc] 
             active:translate-y-2 active:shadow-none transition"
           >

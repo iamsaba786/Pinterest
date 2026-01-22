@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider, UserData } from "./context/UserContext";
-import { PinProvider } from "./context/PinContext"; // ✅ Add PinProvider
+import { PinProvider } from "./context/PinContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -10,6 +10,7 @@ import PinPage from "./pages/PinPage";
 import Create from "./pages/Create";
 import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
+import SearchPage from "./pages/SearchPage";
 
 const AppContent = () => {
   const { loading: userLoading } = UserData();
@@ -25,6 +26,8 @@ const AppContent = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/search/results" element={<SearchPage />} />
             <Route path="/account" element={<Account />} />
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/create" element={<Create />} />

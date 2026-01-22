@@ -11,7 +11,7 @@ import { IoIosArrowDown } from "react-icons/io";
 const Home = () => {
   const navigate = useNavigate();
   const { pins, loading } = PinData();
-  const { isAuth, darkMode, searchQuery = "" } = UserData(); // ✅ Default ""
+  const { isAuth, darkMode, searchQuery = "" } = UserData();
 
   // ✅ LANDING PAGE IF NOT LOGGED IN
   if (!isAuth) {

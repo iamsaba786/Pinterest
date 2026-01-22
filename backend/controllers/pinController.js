@@ -12,12 +12,14 @@ export const createPin = TryCatch(async (req, res) => {
     return res.status(400).json({ message: "File is required" });
   }
 
+  // 1️⃣ Upload image
   const fileUrl = getDataUrl(file);
   const cloud = await cloudinary.v2.uploader.upload(fileUrl, {
     folder: "Pinterest/Pins",
   });
 
-  await Pin.create({
+  // 2️⃣ Create pin in DB
+  const newPin = await Pin.create({
     title,
     pin,
     image: {
@@ -26,45 +28,107 @@ export const createPin = TryCatch(async (req, res) => {
     },
     owner: req.user._id,
   });
-  await redisClient.del("ALL_PINS");
 
+  // 3️⃣  Clear Redis cache (VERY IMPORTANT)
+  await redisClient.del("ALL_PINS");
+  await redisClient.del(`USER_PINS:${req.user._id}`);
+
+  // 4️⃣ Response
   res.status(201).json({
     message: "Pin Created Successfully",
+    pin: newPin,
   });
 });
 
+// export const createPin = TryCatch(async (req, res) => {
+//   const { title, pin } = req.body;
+
+//   const file = req.file;
+//   if (!file) {
+//     return res.status(400).json({ message: "File is required" });
+//   }
+
+//   const fileUrl = getDataUrl(file);
+//   const cloud = await cloudinary.v2.uploader.upload(fileUrl, {
+//     folder: "Pinterest/Pins",
+//   });
+
+//   await Pin.create({
+//     title,
+//     pin,
+//     image: {
+//       id: cloud.public_id,
+//       url: cloud.secure_url,
+//     },
+//     owner: req.user._id,
+//   });
+//   await redisClient.del("ALL_PINS");
+
+//   res.status(201).json({
+//     message: "Pin Created Successfully",
+//   });
+// });
+
+// export const getAllPins = TryCatch(async (req, res) => {
+//   const cachedPins = await redisClient.get("ALL_PINS");
+
+//   if (cachedPins) {
+//     console.log("⚡ Pins from Redis");
+//     return res.json(JSON.parse(cachedPins));
+//   }
+
+//   const pins = await Pin.find().sort({ createdAt: -1 });
+
+//   await redisClient.setEx(
+//     "ALL_PINS",
+//     60, //
+//     JSON.stringify(pins),
+//   );
+
+//   console.log("🐢 Pins from MongoDB");
+//   res.json(pins);
+// });
+
 export const getAllPins = TryCatch(async (req, res) => {
-  const cachedPins = await redisClient.get("ALL_PINS");
+  const cacheKey = "ALL_PINS";
+
+  // 1️⃣ Check Redis cache
+  const cachedPins = await redisClient.get(cacheKey);
 
   if (cachedPins) {
     console.log("⚡ Pins from Redis");
-    return res.json(JSON.parse(cachedPins));
+    return res.status(200).json(JSON.parse(cachedPins));
   }
 
+  // 2️⃣ Fetch from MongoDB
   const pins = await Pin.find().sort({ createdAt: -1 });
 
-  await redisClient.setEx(
-    "ALL_PINS",
-    60, //
-    JSON.stringify(pins),
-  );
+  // 3️⃣ Store in Redis (cache for 60 sec)
+  await redisClient.set(cacheKey, JSON.stringify(pins), "EX", 60);
 
   console.log("🐢 Pins from MongoDB");
-  res.json(pins);
+  res.status(200).json(pins);
 });
 
 export const getSinglePin = TryCatch(async (req, res) => {
-  const key = `PIN_${req.params.id}`;
+  const cacheKey = `PIN:${req.params.id}`;
 
-  const cachedPin = await redisClient.get(key);
+  const cachedPin = await redisClient.get(cacheKey);
   if (cachedPin) {
-    return res.json(JSON.parse(cachedPin));
+    return res.status(200).json(JSON.parse(cachedPin));
   }
 
-  const pin = await Pin.findById(req.params.id).populate("owner", "-password");
+  const pin = await Pin.findById(req.params.id)
+    .populate("owner", "-password")
+    .lean();
 
-  await redisClient.setEx(key, 60, JSON.stringify(pin));
-  res.json(pin);
+  if (!pin) {
+    return res.status(404).json({ message: "Pin not found" });
+  }
+
+  await redisClient.set(cacheKey, JSON.stringify(pin), "EX", 120);
+
+  res.status(200).json(pin);
 });
 
 export const commentOnePin = TryCatch(async (req, res) => {
@@ -131,19 +195,24 @@ export const deleteComment = TryCatch(async (req, res) => {
 export const deletePin = TryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
-  if (!pin)
+  if (!pin) {
     return res.status(400).json({
-      message: "No Pin with thid id",
+      message: "No Pin with this id",
     });
+  }
 
-  if (pin.owner.toString() !== req.user._id.toString())
+  if (pin.owner.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       message: "Unauthorized",
     });
+  }
 
   await cloudinary.v2.uploader.destroy(pin.image.id);
 
   await pin.deleteOne();
+
+  await redisClient.del("ALL_PINS");
+  await redisClient.del(`USER_PINS:${req.user._id}`);
 
   res.json({
     message: "Pin Deleted",
@@ -153,20 +222,25 @@ export const deletePin = TryCatch(async (req, res) => {
 export const updatePin = TryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
-  if (!pin)
+  if (!pin) {
     return res.status(400).json({
       message: "No Pin with this id",
     });
+  }
 
-  if (pin.owner.toString() !== req.user._id.toString())
+  if (pin.owner.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       message: "Unauthorized",
     });
+  }
 
   pin.title = req.body.title;
   pin.pin = req.body.pin;
 
   await pin.save();
+
+  await redisClient.del("ALL_PINS");
+  await redisClient.del(`USER_PINS:${req.user._id}`);
 
   res.json({
     message: "Pin updated",

@@ -1,17 +1,13 @@
-import { createClient } from "redis";
+import Redis from "ioredis";
 
-const redisClient = createClient({
-  url: "redis://127.0.0.1:6379",
+const redisClient = new Redis({
+  host: "redis-13462.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+  port: 13462,
+  password: "CqaKbZ17DG7kyd9cqhgqvVunPvTGoMBW",
 });
 
 redisClient.on("connect", () => {
-  console.log("Redis Connected");
+  console.log("✅ Redis Cloud Connected!");
 });
-
-redisClient.on("error", (err) => {
-  console.log("❌ Redis Error:", err);
-});
-
-await redisClient.connect();
 
 export default redisClient;

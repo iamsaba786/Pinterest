@@ -15,8 +15,6 @@ export const PinProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [pin, setPin] = useState(null);
 
-  // ✅ getAuthHeader DELETE - ab auto handle hota hai!
-
   // ✅ fetchPins - api use kiya
   const fetchPins = useCallback(async () => {
     try {
