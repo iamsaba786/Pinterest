@@ -5,6 +5,7 @@ import { UserData } from "../context/UserContext";
 import { Loading } from "../components/Loading";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const PinPage = () => {
   const { id } = useParams();
@@ -20,7 +21,8 @@ const PinPage = () => {
     deletePin,
   } = PinData();
   const { user, loading: userLoading, darkMode } = UserData();
-
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [edit, setEdit] = useState(false);
   const [title, setTitle] = useState("");
   const [pinValue, setPinValue] = useState("");
@@ -209,7 +211,6 @@ const PinPage = () => {
     );
   }
 
-  // ✅ HANDLERS
   const editHandler = () => {
     setTitle(pin.title || "");
     setPinValue(pin.pin || "");
@@ -235,10 +236,21 @@ const PinPage = () => {
     }
   };
 
-  const deletePinHandler = () => {
-    if (confirm("Delete this pin forever?")) {
-      deletePin(pin._id, navigate);
+  const handleDeleteConfirm = async () => {
+    setShowDeleteConfirmModal(false);
+    setDeleteLoading(true);
+
+    try {
+      await deletePin(pin._id, navigate);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setDeleteLoading(false);
     }
+  };
+
+  const deletePinHandler = () => {
+    setShowDeleteConfirmModal(true);
   };
 
   return (
@@ -392,28 +404,27 @@ const PinPage = () => {
                       <FaEdit className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
                       Edit
                     </button>
-
+                    {/* delete pin btn */}
                     <button
                       onClick={deletePinHandler}
+                      disabled={deleteLoading}
                       className={`
     p-3 rounded-xl font-medium
     flex-1 min-w-[100px] sm:min-w-[120px]
     text-sm sm:text-base
-
     transform transition-all duration-200
     hover:-translate-y-0.5
     active:translate-y-1
-
     ${
       darkMode
         ? `
-          bg-rose-600 hover:bg-rose-500 text-zinc-100
+          bg-rose-600 hover:bg-rose-500 text-zinc-100 disabled:bg-rose-700
           shadow-[0_6px_0_0_rgba(190,18,60,1)]
           hover:shadow-[0_8px_0_0_rgba(190,18,60,1)]
           active:shadow-[0_3px_0_0_rgba(190,18,60,1)]
         `
         : `
-          bg-red-500 hover:bg-red-600 text-white
+          bg-red-500 hover:bg-red-600 text-white disabled:bg-red-600
           shadow-[0_6px_0_0_rgba(185,28,28,1)]
           hover:shadow-[0_8px_0_0_rgba(185,28,28,1)]
           active:shadow-[0_3px_0_0_rgba(185,28,28,1)]
@@ -421,11 +432,36 @@ const PinPage = () => {
     }
   `}
                     >
-                      <MdDelete className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
-                      Delete
+                      {deleteLoading ? (
+                        <svg
+                          className="animate-spin w-4 h-4 mx-auto"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      ) : (
+                        <>
+                          <MdDelete className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
+                          Delete
+                        </>
+                      )}
                     </button>
 
                     {edit && (
+                      // update pin btn
                       <button
                         onClick={updateHandler}
                         className={`
@@ -717,6 +753,95 @@ const PinPage = () => {
           </div>
         </div>
       </div>
+      {/* ✅ DELETE CONFIRMATION MODAL */}
+      {showDeleteConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 backdrop-blur-md bg-black/40"
+            onClick={() => setShowDeleteConfirmModal(false)}
+          />
+
+          {/* Card */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="relative bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 border border-gray-100 dark:border-zinc-700"
+          >
+            <div className="text-center">
+              {/* Delete Icon */}
+              <div className="w-20 h-20 bg-gradient-to-br from-rose-100 to-red-100 dark:from-rose-900/30 dark:to-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6 p-4">
+                <svg
+                  className="w-12 h-12 text-rose-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </div>
+
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Delete Pin ?
+              </h2>
+
+              <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                This pin will be permanently deleted. Are you sure you want to
+                delete.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirmModal(false)}
+                  disabled={deleteLoading}
+                  className="flex-1 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white px-6 py-3 rounded-2xl font-medium hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all duration-200 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  className="flex-1 bg-gradient-to-r from-rose-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-rose-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  {deleteLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Deleting...
+                    </>
+                  ) : (
+                    "Yes"
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

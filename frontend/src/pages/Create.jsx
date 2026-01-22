@@ -153,7 +153,7 @@ const Create = () => {
             />
           </div>
 
-          {/* 3D BUTTON */}
+          {/* 3D create BUTTON */}
           <button
             type="submit"
             className="relative bottom-4 px-12 py-4 rounded-full font-semibold
