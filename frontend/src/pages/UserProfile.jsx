@@ -52,7 +52,7 @@ const UserProfile = () => {
 
   const userPins = React.useMemo(() => {
     if (!Array.isArray(pins) || !profileUser?._id) return [];
-    return pins.filter((pin) => pin.owner?._id === profileUser._id);
+    return pins.filter((pin) => pin.owner === profileUser._id);
   }, [pins, profileUser?._id]);
 
   useEffect(() => {
@@ -83,11 +83,7 @@ const UserProfile = () => {
       <div
         className={`
         min-h-screen pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center justify-center px-4
-        ${
-          darkMode
-            ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black"
-            : "bg-gradient-to-br from-white to-red-50"
-        }
+        ${darkMode ? "bg-black" : "bg-gradient-to-br from-white to-red-50"}
       `}
       >
         <div className="text-center p-8 sm:p-12 max-w-md w-full mx-4">
@@ -155,7 +151,7 @@ const UserProfile = () => {
       min-h-screen pt-4 sm:pt-6 md:pt-8 lg:pt-20 transition-colors duration-300
       ${
         darkMode
-          ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black text-zinc-100"
+          ? "bg-zinc-900 text-zinc-100"
           : "bg-gradient-to-br from-white to-red-50 text-gray-900"
       }
     `}

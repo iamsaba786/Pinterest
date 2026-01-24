@@ -184,18 +184,28 @@ const Navbar = () => {
                     <Plus size={20} />
                   </button>
 
-                  <div
-                    className={`p-2.5 rounded-2xl relative transition-all duration-200 ${
+                     {/* save pins link  */}
+                  <Link
+                    to="/saved"
+                    className={`p-2.5 rounded-2xl transition-all duration-200 hover:shadow-md relative ${
                       darkMode
-                        ? "text-zinc-400 hover:text-rose-400 hover:bg-zinc-800/70"
-                        : "text-gray-600 hover:text-rose-500 hover:bg-rose-50"
+                        ? "text-zinc-400 hover:text-rose-400 hover:bg-zinc-800/70 shadow-zinc-900/20"
+                        : "text-gray-600 hover:text-rose-500 hover:bg-rose-50 shadow-sm hover:shadow-md"
                     }`}
+                    title="Saved Pins"
                   >
-                    <Bell size={20} />
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse shadow-lg">
-                      3
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {/* Notification badge */}
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                      {user?.savedBoards?.length || 1}
                     </span>
-                  </div>
+                  </Link>
 
                   {/* Profile picture */}
                   <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-rose-400 p-px shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer hover:rotate-3 flex items-center justify-center">
@@ -265,7 +275,7 @@ const Navbar = () => {
               className={`flex items-center px-5 py-4 text-base font-semibold rounded-2xl transition-all duration-200 w-full ${
                 darkMode
                   ? "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
-                  : "text-gray-300 hover:bg-gray-50/80"
+                  : "text-gray-300 hover:bg-zinc-800/60"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -281,7 +291,7 @@ const Navbar = () => {
               className={`flex items-center px-5 py-4 text-base font-semibold rounded-2xl w-full text-left transition-all duration-200 ${
                 darkMode
                   ? "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
-                  : "text-gray-300 hover:bg-gray-50/80"
+                  : "text-gray-300 hover:bg-zinc-800/60"
               }`}
             >
               <motion.div
@@ -305,7 +315,7 @@ const Navbar = () => {
               className={`w-full flex items-center px-5 py-4 text-base font-semibold rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                 darkMode
                   ? "text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
-                  : "text-rose-600 hover:bg-rose-50"
+                  : "text-rose-600 hover:bg-rose-500/10"
               }`}
             >
               <LogOut className="w-6 h-6 mr-4" />
@@ -346,8 +356,14 @@ const Navbar = () => {
             >
               <Plus size={26} />
             </button>
-            <button className="flex flex-col items-center justify-center gap-0.5">
-              <Bell size={22} />
+           <button
+              onClick={() => navigate("/saved")}
+              className="flex flex-col items-center justify-center gap-0.5 p-2 rounded-full hover:bg-rose-50 dark:hover:bg-zinc-800"
+              title="Saved"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
             </button>
             <button
               onClick={() => setMobileMenuOpen((prev) => !prev)}

@@ -3,6 +3,7 @@ import { User } from "../models/userModel.js";
 
 export const isAuth = async (req, res, next) => {
   try {
+    console.log("Cookies:", req.cookies);
     const token = req.cookies.token;
 
     if (!token)

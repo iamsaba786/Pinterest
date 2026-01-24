@@ -246,3 +246,46 @@ export const updatePin = TryCatch(async (req, res) => {
     message: "Pin updated",
   });
 });
+
+export const savePin = TryCatch(async (req, res) => {
+  const { Pin } = await import("../models/pinModel.js");
+  const { pinId } = req.body;
+
+  const pin = await Pin.findById(pinId);
+  if (!pin) return res.status(404).json({ message: "Pin not found" });
+
+  // ❌ creator cannot save own pin
+  if (pin.owner.toString() === req.user._id.toString()) {
+    return res.status(403).json({ message: "You cannot save your own pin" });
+  }
+
+  if (pin.savedBy?.includes(req.user._id)) {
+    return res.json({ message: "Already saved" });
+  }
+
+  pin.savedBy = pin.savedBy || [];
+  pin.savedBy.push(req.user._id);
+  await pin.save();
+
+  res.json({ message: "Pin saved successfully" });
+});
+
+export const removeSavedPin = TryCatch(async (req, res) => {
+  const { Pin } = await import("../models/pinModel.js");
+  const { pinId } = req.body;
+
+  await Pin.updateOne({ _id: pinId }, { $pull: { savedBy: req.user._id } });
+
+  res.json({ message: "Pin removed from saved" });
+});
+
+export const getSavedPins = TryCatch(async (req, res) => {
+  console.log("User in getSavedPins:", req.user);
+  const { Pin } = await import("../models/pinModel.js");
+
+  const pins = await Pin.find({
+    savedBy: req.user._id,
+  }).populate("owner", "name avatar");
+
+  res.json(pins);
+});

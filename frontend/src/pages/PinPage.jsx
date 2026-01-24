@@ -6,6 +6,7 @@ import { Loading } from "../components/Loading";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 const PinPage = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const PinPage = () => {
     deleteComment,
     deletePin,
   } = PinData();
+
   const { user, loading: userLoading, darkMode } = UserData();
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -253,6 +255,30 @@ const PinPage = () => {
     setShowDeleteConfirmModal(true);
   };
 
+  const toggleSave = async (pinId) => {
+    try {
+      const isSaved = user.savedPins?.includes(pinId);
+
+      const res = await fetch(isSaved ? "/api/pin/unsave" : "/api/pin/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ pinId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Something went wrong");
+        return;
+      }
+
+      toast.success(isSaved ? "Removed from saved" : "Saved pin");
+    } catch (err) {
+      toast.error("Save failed");
+    }
+  };
+
   return (
     <div
       className={`
@@ -373,6 +399,7 @@ const PinPage = () => {
 
                 {user._id === pin.owner?._id && (
                   <div className="flex flex-wrap gap-2 lg:flex-col lg:gap-2 w-full lg:w-auto">
+                    {/* edit */}
                     <button
                       onClick={editHandler}
                       className={`
@@ -549,6 +576,50 @@ const PinPage = () => {
                   </div>
                 </Link>
               )}
+
+              {/* 👇 SAVE SECTION - SABKE LIYE */}
+              <div className="p-4 sm:p-6 rounded-3xl border backdrop-blur-sm transition-all">
+                <button
+                  onClick={() => toggleSave(pin._id)}
+                  className={`
+                    w-full p-4 rounded-2xl flex items-center gap-3 transition-all hover:shadow-xl hover:-translate-y-1
+                    ${
+                      darkMode
+                        ? "bg-zinc-800/50 hover:bg-zinc-700/70 border border-zinc-700/50"
+                        : "bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-100"
+                    }
+                  `}
+                >
+                  <div
+                    className={`
+                    w-12 h-12 rounded-full flex items-center justify-center shadow-lg
+                    ${
+                      darkMode
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-400/25"
+                        : "bg-gradient-to-r from-blue-400 to-indigo-400 shadow-blue-300/25"
+                    }
+                  `}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 00.683 1.541l3.656 2.525a1 1 0 001.518 0l3.656-2.525A2 2 0 0015 11.268V4a1 1 0 10-2 0v7.268a1 1 0 01-.683.797l-3.656 2.525a1 1 0 01-1.518 0l-3.656-2.525A1 1 0 015 11.268V4z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg sm:text-xl">
+                      {user.savedPins?.includes(pin._id)
+                        ? "❤️ Saved"
+                        : "🤍 Save"}
+                    </h3>
+                    <p className="text-sm opacity-75">
+                      {user.savedPins?.length || 0} saved pins
+                    </p>
+                  </div>
+                </button>
+              </div>
 
               {/* COMMENT FORM */}
               <form

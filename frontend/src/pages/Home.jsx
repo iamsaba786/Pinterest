@@ -21,7 +21,7 @@ const Home = () => {
         min-h-screen relative overflow-hidden transition-colors duration-300
         ${
           darkMode
-            ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black text-zinc-100"
+            ? "bg-zinc-900 text-zinc-100"
             : "bg-gradient-to-br from-white via-rose-50 to-pink-50 text-gray-900"
         }
       `}

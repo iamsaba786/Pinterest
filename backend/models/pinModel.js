@@ -35,10 +35,16 @@ const schema = new mongoose.Schema(
         },
       },
     ],
+    savedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const Pin = mongoose.model("Pin", schema);

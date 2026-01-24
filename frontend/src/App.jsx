@@ -11,6 +11,7 @@ import Create from "./pages/Create";
 import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
 import SearchPage from "./pages/SearchPage";
+import SavePins from "./components/SavePins";
 
 const AppContent = () => {
   const { loading: userLoading } = UserData();
@@ -32,6 +33,7 @@ const AppContent = () => {
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/create" element={<Create />} />
             <Route path="/pin/:id" element={<PinPage />} />
+            <Route path="/saved" element={<SavePins />} />
           </Routes>
         </>
       )}
