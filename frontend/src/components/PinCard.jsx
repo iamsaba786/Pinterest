@@ -52,7 +52,7 @@ const PinCard = ({ pin }) => {
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-6">
+            <div className="absolute inset-0 bg-zinc-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-6">
               <div className="text-white w-full flex justify-between items-start">
                 <div className="flex-1">
                   <h3 className="font-bold text-lg mb-2 line-clamp-2">
