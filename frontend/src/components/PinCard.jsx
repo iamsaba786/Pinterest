@@ -12,7 +12,7 @@ const PinCard = ({ pin }) => {
     e.stopPropagation();
 
     try {
-      const res = await fetch(`http://localhost:5000/api/pin/save/${pin._id}`, {
+      const res = await fetch(`${API_URL}/api/pin/save/${pin._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
