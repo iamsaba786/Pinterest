@@ -21,6 +21,9 @@ const Account = () => {
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [showDeletePinModal, setShowDeletePinModal] = useState(false);
+  const [selectedPinId, setSelectedPinId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     setEditName(user?.name || "");
@@ -71,13 +74,24 @@ const Account = () => {
   };
 
   // DELETE PIN
-  const deletePinHandler = async (pinId) => {
-    if (!confirm("Delete this pin forever?")) return;
+  const deletePinHandler = (pinId) => {
+    setSelectedPinId(pinId);
+    setShowDeletePinModal(true);
+  };
+
+  const handleDeletePinConfirm = async () => {
+    if (!selectedPinId) return;
+
+    setDeleteLoading(true);
     try {
-      await api.delete(`/pin/${pinId}`);
+      await api.delete(`/pin/${selectedPinId}`);
       toast.success("Pin deleted!");
     } catch (error) {
       toast.error("Delete failed");
+    } finally {
+      setDeleteLoading(false);
+      setShowDeletePinModal(false);
+      setSelectedPinId(null);
     }
   };
 
@@ -401,6 +415,56 @@ const Account = () => {
                   ) : (
                     "Yes"
                   )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      {/* Delete Pin Confirmation Modal */}
+      {showDeletePinModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 backdrop-blur-md bg-black/40"
+            onClick={() => setShowDeletePinModal(false)}
+          />
+
+          {/* Card */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="relative bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 border border-gray-100 dark:border-zinc-700"
+          >
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-rose-100 to-red-100 dark:from-rose-900/30 dark:to-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6 p-4">
+                <FaTrash className="w-10 h-10 text-rose-600" />
+              </div>
+
+              <h2 className="text-2xl font-bold dark:text-zinc-300 mb-3">
+                Delete Pin ?
+              </h2>
+
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
+                This pin will be permanently deleted.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeletePinModal(false)}
+                  disabled={deleteLoading}
+                  className="flex-1 bg-gray-100 dark:bg-zinc-800 dark:text-zinc-300 px-6 py-3 rounded-2xl font-medium"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleDeletePinConfirm}
+                  disabled={deleteLoading}
+                  className="flex-1 bg-gradient-to-r from-rose-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold"
+                >
+                  {deleteLoading ? "Deleting..." : "Yes"}
                 </button>
               </div>
             </div>

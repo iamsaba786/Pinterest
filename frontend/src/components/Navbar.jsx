@@ -162,6 +162,7 @@ const Navbar = () => {
               <>
                 {/* Desktop icons */}
                 <div className="hidden md:flex items-center space-x-1.5">
+                  {/* home */}
                   <Link
                     to="/"
                     className={`p-2.5 rounded-2xl transition-all duration-200 hover:shadow-md ${
@@ -172,7 +173,7 @@ const Navbar = () => {
                   >
                     <Home size={20} />
                   </Link>
-
+                  {/* plus */}
                   <button
                     onClick={() => navigate("/create")}
                     className={`p-2.5 rounded-2xl transition-all duration-200 relative shadow-sm hover:shadow-md ${
@@ -184,7 +185,7 @@ const Navbar = () => {
                     <Plus size={20} />
                   </button>
 
-                     {/* save pins link  */}
+                  {/* save pins link  */}
                   <Link
                     to="/saved"
                     className={`p-2.5 rounded-2xl transition-all duration-200 hover:shadow-md relative ${
@@ -202,9 +203,9 @@ const Navbar = () => {
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     {/* Notification badge */}
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
-                      {user?.savedBoards?.length || 1}
-                    </span>
+                    {/* <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                      {user?.savedPins?.length || 1}
+                    </span> */}
                   </Link>
 
                   {/* Profile picture */}
@@ -356,13 +357,13 @@ const Navbar = () => {
             >
               <Plus size={26} />
             </button>
-           <button
+            <button
               onClick={() => navigate("/saved")}
               className="flex flex-col items-center justify-center gap-0.5 p-2 rounded-full hover:bg-rose-50 dark:hover:bg-zinc-800"
               title="Saved"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
             <button

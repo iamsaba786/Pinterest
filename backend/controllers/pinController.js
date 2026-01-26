@@ -248,44 +248,36 @@ export const updatePin = TryCatch(async (req, res) => {
 });
 
 export const savePin = TryCatch(async (req, res) => {
-  const { Pin } = await import("../models/pinModel.js");
-  const { pinId } = req.body;
+  const pin = await Pin.findById(req.params.id);
 
-  const pin = await Pin.findById(pinId);
-  if (!pin) return res.status(404).json({ message: "Pin not found" });
-
-  // ❌ creator cannot save own pin
-  if (pin.owner.toString() === req.user._id.toString()) {
-    return res.status(403).json({ message: "You cannot save your own pin" });
+  if (!pin) {
+    return res.status(404).json({ message: "No Pin with this ID" });
   }
 
-  if (pin.savedBy?.includes(req.user._id)) {
-    return res.json({ message: "Already saved" });
+  // Check if user has already saved the pin
+  if (pin.savedBy.includes(req.user._id)) {
+    // Already saved -> Remove it (Unsave)
+    const index = pin.savedBy.indexOf(req.user._id);
+    pin.savedBy.splice(index, 1);
+    await pin.save();
+
+    res.status(200).json({ message: "Pin Unsaved" });
+  } else {
+    // Not saved -> Add user ID to array (Save)
+    pin.savedBy.push(req.user._id);
+    await pin.save();
+
+    res.status(200).json({ message: "Pin Saved" });
   }
-
-  pin.savedBy = pin.savedBy || [];
-  pin.savedBy.push(req.user._id);
-  await pin.save();
-
-  res.json({ message: "Pin saved successfully" });
 });
 
-export const removeSavedPin = TryCatch(async (req, res) => {
-  const { Pin } = await import("../models/pinModel.js");
-  const { pinId } = req.body;
-
-  await Pin.updateOne({ _id: pinId }, { $pull: { savedBy: req.user._id } });
-
-  res.json({ message: "Pin removed from saved" });
-});
-
+// 2. Get All Saved Pins for Logged-in User
 export const getSavedPins = TryCatch(async (req, res) => {
-  console.log("User in getSavedPins:", req.user);
-  const { Pin } = await import("../models/pinModel.js");
+  // Query: Find pins where savedBy array contains req.user._id
+  const pins = await Pin.find({ savedBy: req.user._id }).populate(
+    "owner",
+    "name avatar",
+  );
 
-  const pins = await Pin.find({
-    savedBy: req.user._id,
-  }).populate("owner", "name avatar");
-
-  res.json(pins);
+  res.status(200).json(pins);
 });

@@ -29,11 +29,11 @@ const AppContent = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/search/results" element={<SearchPage />} />
+            <Route path="/saved" element={<SavePins />} />
             <Route path="/account" element={<Account />} />
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/create" element={<Create />} />
             <Route path="/pin/:id" element={<PinPage />} />
-            <Route path="/saved" element={<SavePins />} />
           </Routes>
         </>
       )}

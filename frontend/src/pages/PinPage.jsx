@@ -6,7 +6,7 @@ import { Loading } from "../components/Loading";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const PinPage = () => {
   const { id } = useParams();
@@ -23,6 +23,13 @@ const PinPage = () => {
   } = PinData();
 
   const { user, loading: userLoading, darkMode } = UserData();
+
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [selectedCommentId, setSelectedCommentId] = useState(null);
+  const [commentDeleteLoading, setCommentDeleteLoading] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -57,6 +64,43 @@ const PinPage = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (pin?._id && user?._id) {
+      setIsSaved(pin.savedBy?.includes(user._id) || false);
+    }
+  }, [pin, user]);
+
+  const handleSave = useCallback(
+    async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      setSaveLoading(true);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/pin/save/${pin._id}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          },
+        );
+
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(data.message);
+          setIsSaved(true);
+          await fetchPin(id);
+        }
+      } catch (error) {
+        toast.error("Something went wrong");
+      } finally {
+        setSaveLoading(false);
+      }
+    },
+    [pin?._id, fetchPin, id],
+  );
 
   // ✅ LOADING
   if (pageLoading || userLoading || pinLoading) {
@@ -233,8 +277,22 @@ const PinPage = () => {
   };
 
   const deleteCommentHandler = (commentId) => {
-    if (confirm("Delete this comment?")) {
-      deleteComment(pin._id, commentId);
+    setSelectedCommentId(commentId);
+    setShowDeleteCommentModal(true);
+  };
+
+  const handleDeleteCommentConfirm = async () => {
+    if (!selectedCommentId) return;
+
+    setCommentDeleteLoading(true);
+    try {
+      await deleteComment(pin._id, selectedCommentId);
+    } catch (err) {
+      console.error("Comment delete failed", err);
+    } finally {
+      setCommentDeleteLoading(false);
+      setShowDeleteCommentModal(false);
+      setSelectedCommentId(null);
     }
   };
 
@@ -255,29 +313,33 @@ const PinPage = () => {
     setShowDeleteConfirmModal(true);
   };
 
-  const toggleSave = async (pinId) => {
-    try {
-      const isSaved = user.savedPins?.includes(pinId);
+  // const handleSave = async (e) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
 
-      const res = await fetch(isSaved ? "/api/pin/unsave" : "/api/pin/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ pinId }),
-      });
+  //   setSaveLoading(true);
+  //   try {
+  //     const res = await fetch(`http://localhost:5000/api/pin/save/${pin._id}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       credentials: "include",
+  //     });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.message || "Something went wrong");
-        return;
-      }
-
-      toast.success(isSaved ? "Removed from saved" : "Saved pin");
-    } catch (err) {
-      toast.error("Save failed");
-    }
-  };
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       toast.success(data.message);
+  //       setIsSaved(true); // Local state update
+  //       // Pin data refresh ke liye
+  //       await fetchPin(id);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Something went wrong");
+  //   } finally {
+  //     setSaveLoading(false);
+  //   }
+  // };
 
   return (
     <div
@@ -285,7 +347,7 @@ const PinPage = () => {
       min-h-screen pt-4 sm:pt-6 md:pt-8 lg:pt-20 transition-colors duration-300
       ${
         darkMode
-          ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-black text-zinc-100"
+          ? "bg-black text-zinc-100"
           : "bg-gradient-to-br from-white via-red-50 to-pink-50 text-gray-900"
       }
     `}
@@ -305,12 +367,9 @@ const PinPage = () => {
             {/* IMAGE */}
             <div
               className={`
-              relative h-64 sm:h-80 md:h-96 lg:h-[400px] xl:h-[500px] overflow-hidden transition-colors
-              ${
-                darkMode
-                  ? "bg-gradient-to-br from-zinc-800 to-zinc-700"
-                  : "bg-gradient-to-br from-gray-50 to-gray-100"
-              }
+              relative h-64 sm:h-80 md:h-96 lg:h-[400px] xl:h-[500px] overflow-hidden 
+              transition-colors group cursor-pointer
+              ${darkMode ? "bg-black" : "bg-gradient-to-br from-gray-50 to-gray-100"}
             `}
             >
               {pin.image?.url ? (
@@ -326,7 +385,7 @@ const PinPage = () => {
                   w-full h-full flex items-center justify-center transition-colors
                   ${
                     darkMode
-                      ? "bg-gradient-to-br from-zinc-800 to-zinc-700 text-zinc-500"
+                      ? "bg-black text-zinc-500"
                       : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500"
                   }
                 `}
@@ -414,16 +473,16 @@ const PinPage = () => {
     ${
       darkMode
         ? `
-          bg-zinc-500 hover:bg-zinc-500 text-zinc-100
-          shadow-[0_6px_0_0_rgba(85,82,91,1)]
-          hover:shadow-[0_8px_0_0_rgba(85,82,93,1)]
-          active:shadow-[0_3px_0_0_rgba(85,82,95,1)]
+          bg-blue-900 hover:bg-blue-800 text-white
+          shadow-[0_6px_0_0_rgba(23,37,84,1)]
+hover:shadow-[0_8px_0_0_rgba(21,35,82,1)]
+active:shadow-[0_3px_0_0_rgba(23,37,84,1)]
         `
         : `
-          bg-blue-500 hover:bg-blue-600 text-white
-          shadow-[0_6px_0_0_rgba(29,78,216,1)]
-          hover:shadow-[0_8px_0_0_rgba(29,78,216,1)]
-          active:shadow-[0_3px_0_0_rgba(29,78,216,1)]
+          bg-blue-900 hover:bg-blue-800 text-white
+          shadow-[0_6px_0_0_rgba(23,37,84,1)]
+hover:shadow-[0_8px_0_0_rgba(21,35,82,1)]
+active:shadow-[0_3px_0_0_rgba(23,37,84,1)]
         `
     }
   `}
@@ -436,25 +495,26 @@ const PinPage = () => {
                       onClick={deletePinHandler}
                       disabled={deleteLoading}
                       className={`
-    p-3 rounded-xl font-medium
-    flex-1 min-w-[100px] sm:min-w-[120px]
-    text-sm sm:text-base
-    transform transition-all duration-200
-    hover:-translate-y-0.5
-    active:translate-y-1
+                      p-3 rounded-xl font-medium
+                      flex-1 min-w-[100px] sm:min-w-[120px]
+                      text-sm sm:text-base
+                      transform transition-all duration-200
+                      hover:-translate-y-0.5
+                      active:translate-y-1 mt-2
     ${
       darkMode
         ? `
-          bg-rose-600 hover:bg-rose-500 text-zinc-100 disabled:bg-rose-700
-          shadow-[0_6px_0_0_rgba(190,18,60,1)]
-          hover:shadow-[0_8px_0_0_rgba(190,18,60,1)]
-          active:shadow-[0_3px_0_0_rgba(190,18,60,1)]
+          bg-red-900 hover:bg-red-800 text-white disabled:bg-red-800
+            shadow-[0_6px_0_0_rgba(69,10,10,1)]
+            hover:shadow-[0_8px_0_0_rgba(69,10,10,1)]
+            active:shadow-[0_3px_0_0_rgba(69,10,10,1)]
         `
         : `
-          bg-red-500 hover:bg-red-600 text-white disabled:bg-red-600
-          shadow-[0_6px_0_0_rgba(185,28,28,1)]
-          hover:shadow-[0_8px_0_0_rgba(185,28,28,1)]
-          active:shadow-[0_3px_0_0_rgba(185,28,28,1)]
+          bg-red-900 hover:bg-red-800 text-white disabled:bg-red-800
+            shadow-[0_6px_0_0_rgba(69,10,10,1)]
+            hover:shadow-[0_8px_0_0_rgba(69,10,10,1)]
+            active:shadow-[0_3px_0_0_rgba(69,10,10,1)]
+
         `
     }
   `}
@@ -525,6 +585,46 @@ const PinPage = () => {
                 )}
               </div>
 
+              {/* Save Button */}
+              <div className="">
+                <button
+                  onClick={handleSave}
+                  disabled={saveLoading}
+                  className={`
+                  text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold shadow-lg 
+                   transform active:scale-95 transition-all flex items-center gap-1
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   ${isSaved ? "bg-black" : "bg-red-600 hover:bg-red-700"}
+                 `}
+                >
+                  {saveLoading ? (
+                    <svg
+                      className="animate-spin w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                  ) : isSaved ? (
+                    "Saved"
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+
               {/* OWNER */}
               {pin.owner && (
                 <Link
@@ -576,50 +676,6 @@ const PinPage = () => {
                   </div>
                 </Link>
               )}
-
-              {/* 👇 SAVE SECTION - SABKE LIYE */}
-              <div className="p-4 sm:p-6 rounded-3xl border backdrop-blur-sm transition-all">
-                <button
-                  onClick={() => toggleSave(pin._id)}
-                  className={`
-                    w-full p-4 rounded-2xl flex items-center gap-3 transition-all hover:shadow-xl hover:-translate-y-1
-                    ${
-                      darkMode
-                        ? "bg-zinc-800/50 hover:bg-zinc-700/70 border border-zinc-700/50"
-                        : "bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border border-gray-100"
-                    }
-                  `}
-                >
-                  <div
-                    className={`
-                    w-12 h-12 rounded-full flex items-center justify-center shadow-lg
-                    ${
-                      darkMode
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-400/25"
-                        : "bg-gradient-to-r from-blue-400 to-indigo-400 shadow-blue-300/25"
-                    }
-                  `}
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 00.683 1.541l3.656 2.525a1 1 0 001.518 0l3.656-2.525A2 2 0 0015 11.268V4a1 1 0 10-2 0v7.268a1 1 0 01-.683.797l-3.656 2.525a1 1 0 01-1.518 0l-3.656-2.525A1 1 0 015 11.268V4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg sm:text-xl">
-                      {user.savedPins?.includes(pin._id)
-                        ? "❤️ Saved"
-                        : "🤍 Save"}
-                    </h3>
-                    <p className="text-sm opacity-75">
-                      {user.savedPins?.length || 0} saved pins
-                    </p>
-                  </div>
-                </button>
-              </div>
 
               {/* COMMENT FORM */}
               <form
@@ -907,6 +963,54 @@ const PinPage = () => {
                   ) : (
                     "Yes"
                   )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      {/* ✅ DELETE COMMENT CONFIRMATION MODAL */}
+      {showDeleteCommentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 backdrop-blur-md bg-black/40"
+            onClick={() => setShowDeleteCommentModal(false)}
+          />
+
+          {/* Card */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="relative bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 border border-gray-100 dark:border-zinc-700"
+          >
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-rose-100 to-red-100 dark:from-rose-900/30 dark:to-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6 p-4">
+                <MdDelete className="w-10 h-10 text-rose-600" />
+              </div>
+
+              <h2 className="text-2xl font-bold mb-3">Delete Comment ?</h2>
+
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
+                This comment will be permanently deleted.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteCommentModal(false)}
+                  disabled={commentDeleteLoading}
+                  className="flex-1 bg-gray-100 dark:bg-zinc-800 px-6 py-3 rounded-2xl font-medium"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleDeleteCommentConfirm}
+                  disabled={commentDeleteLoading}
+                  className="flex-1 bg-gradient-to-r from-rose-500 to-red-500 text-white px-6 py-3 rounded-2xl font-semibold"
+                >
+                  {commentDeleteLoading ? "Deleting..." : "Yes"}
                 </button>
               </div>
             </div>

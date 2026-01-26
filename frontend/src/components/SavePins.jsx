@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
+import PinCard from "../components/PinCard";
+import { UserData } from "../context/UserContext";
 
 const SavePins = () => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchSavedPins();
-  }, []);
+  const { darkMode } = UserData();
 
   const fetchSavedPins = async () => {
     try {
@@ -17,109 +16,70 @@ const SavePins = () => {
       const data = await res.json();
       setPins(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
-      setPins([]);
+      console.error("Error fetching saved pins:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const removePin = async (pinId) => {
-    await fetch("/api/pin/unsave", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ pinId }),
-    });
-
-    setPins((prev) => prev.filter((p) => p._id !== pinId));
-  };
+  useEffect(() => {
+    fetchSavedPins();
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="w-12 h-12 border-4 border-neutral-300 border-t-black rounded-full animate-spin" />
+      <div
+        className={`min-h-screen pt-24 text-center font-medium ${darkMode ? "bg-zinc-950 text-white" : "bg-white text-black"}`}
+      >
+        <div className="animate-bounce">Loading your collection...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-6 py-10">
-      <div className="max-w-7xl mx-auto">
-        {/* HEADER */}
-        <div className="mb-4 mt-10">
-          <h1 className="text-4xl font-bold text-neutral-900">Saved Pins</h1>
-          <p className="text-neutral-500 mt-1">
-            All the pins you’ve saved in one place
+    <div
+      className={`min-h-screen pt-20 transition-colors duration-300 ${darkMode ? "bg-zinc-950 text-white" : "bg-white text-black"}`}
+    >
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
+            Saved Pins
+          </h1>
+          <p
+            className={`text-sm mt-2 ${darkMode ? "text-zinc-400" : "text-gray-500"}`}
+          >
+            {pins.length} {pins.length === 1 ? "Pin" : "Pins"} saved to your
+            account
           </p>
         </div>
 
-        {/* EMPTY STATE */}
+        {/* Empty State */}
         {pins.length === 0 ? (
-          <div className="text-center py-32">
-            <h2 className="text-2xl font-semibold text-neutral-800 mb-3">
-              No saved pins
-            </h2>
-            <p className="text-neutral-500 mb-6">
-              Save pins to see them here later
-            </p>
-            <a
-              href="/"
-              className="inline-block px-8 py-3 rounded-xl font-medium
-              bg-black text-white
-              shadow-[0_6px_0_#111]
-              hover:translate-y-[2px]
-              hover:shadow-[0_4px_0_#111]
-              active:translate-y-[6px]
-              active:shadow-none
-              transition-all"
+          <div className="flex flex-col items-center justify-center mt-20 space-y-4">
+            <div
+              className={`p-6 rounded-full ${darkMode ? "bg-zinc-900" : "bg-gray-100"}`}
             >
-              Explore Pins
-            </a>
+              <svg
+                className="w-12 h-12 opacity-50"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+            </div>
+            <p
+              className={`text-lg font-medium ${darkMode ? "text-zinc-400" : "text-gray-500"}`}
+            >
+              No pins saved yet. Start exploring!
+            </p>
           </div>
         ) : (
-          /* PINS GRID */
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6">
+          /* Pinterest Style Responsive Grid */
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {pins.map((pin) => (
-              <div
-                key={pin._id}
-                className="mb-6 break-inside-avoid bg-white rounded-2xl overflow-hidden
-                shadow-lg hover:shadow-2xl transition-shadow"
-              >
-                <div className="relative">
-                  <img
-                    src={pin.image?.url || pin.image}
-                    alt={pin.title}
-                    className="w-full object-cover"
-                  />
-
-                  {/* REMOVE BUTTON (3D) */}
-                  <button
-                    onClick={() => removePin(pin._id)}
-                    className="
-                      absolute top-3 right-3
-                      px-4 py-2 text-sm font-semibold
-                      bg-white text-black rounded-xl
-                      shadow-[0_5px_0_#999]
-                      hover:translate-y-[2px]
-                      hover:shadow-[0_3px_0_#999]
-                      active:translate-y-[5px]
-                      active:shadow-none
-                      transition-all
-                    "
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="p-4">
-                  <h3 className="font-semibold text-neutral-900 line-clamp-2">
-                    {pin.title}
-                  </h3>
-                  <p className="text-sm text-neutral-500 mt-1 line-clamp-2">
-                    {pin.description || pin.pin}
-                  </p>
-                </div>
+              <div key={pin._id} className="break-inside-avoid">
+                <PinCard pin={pin} />
               </div>
             ))}
           </div>
